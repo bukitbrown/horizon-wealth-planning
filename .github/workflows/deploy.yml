@@ -29,8 +29,8 @@ jobs:
           cp index.html _site/
           cp -r assets _site/assets
           mkdir _site/hooks
-          cp .claude/hooks/chatbot-greeting.js _site/hooks/
-          sed -i 's#\.claude/hooks/chatbot-greeting\.js#hooks/chatbot-greeting.js#' _site/index.html
+          cp .claude/hooks/chatbot-greeting.js .claude/hooks/talk-popup.js _site/hooks/
+          sed -i 's#\.claude/hooks/#hooks/#g' _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
