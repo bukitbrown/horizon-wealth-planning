@@ -10,6 +10,7 @@
     "wcag/h30": "off",
     "heading-level": "off",
     "no-implicit-button-type": "off",
+    "no-autoplay": "off",
     "long-title": "off",
     "element-required-attributes": "warn"
   }

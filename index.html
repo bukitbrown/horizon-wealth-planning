@@ -187,7 +187,7 @@
     .waiting-note { max-width: 46ch; color: var(--muted); font-size: var(--step-small); }
     .waiting-ctl { background: #fff; border-radius: var(--radius); padding: 1.1rem 1.25rem; min-width: min(100%, 320px); font-size: 15px; }
     .waiting-ctl label { display: flex; justify-content: space-between; font-weight: 500; }
-    .waiting-ctl output { font-variant-numeric: tabular-nums; }
+    .waiting-ctl #monthlyOut { font-variant-numeric: tabular-nums; }
     .waiting-ctl input { margin: .75rem 0 0; }
     .bars { margin-top: auto; padding-top: 3rem; display: grid; gap: 6px; }
     .bar { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; outline-offset: 2px; }
@@ -584,7 +584,7 @@
             <p class="waiting-note fade-in" id="gapNote">Illustration only. Saving a fixed amount every month at an assumed 4% a year, compounded monthly, until age 65. Real returns vary and are not guaranteed.</p>
           </div>
           <div class="waiting-ctl fade-in" data-ui>
-            <label for="monthly">Saved or invested each month <output id="monthlyOut" for="monthly">S$300</output></label>
+            <label for="monthly">Saved or invested each month <span id="monthlyOut">S$300</span></label>
             <input type="range" id="monthly" min="100" max="1000" step="50" value="300">
           </div>
         </div>
@@ -796,7 +796,7 @@
             <p class="lead">Tell us a little about where you are. A planner will reply within one business day.</p>
             <dl class="info-list">
               <div><dt>Email</dt><dd><a href="mailto:hello@horizonwealth.example">hello@horizonwealth.example</a></dd></div>
-              <div><dt>Phone and WhatsApp</dt><dd><a href="tel:+6561234567">+65 6123 4567</a></dd></div>
+              <div><dt>Phone and WhatsApp</dt><dd><a href="tel:+6561234567">+65&nbsp;6123&nbsp;4567</a></dd></div>
               <div><dt>Office</dt><dd>88 Market Street, #25-01, Capital Tower<br>Singapore 048948</dd></div>
               <div><dt>Hours</dt><dd>Mon to Fri 9am to 6pm, Sat 10am to 1pm<br>Closed Sundays and public holidays</dd></div>
             </dl>
