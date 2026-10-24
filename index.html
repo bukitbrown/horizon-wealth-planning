@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en-SG">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Horizon Wealth Planning | Financial planning for your first pay cheque in Singapore</title>
+  <meta name="description" content="Make your first payslip count. Free payslip planner for Singapore: see your CPF, tax and take-home, then plan savings, insurance and investing with Horizon Wealth Planning.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Headline:wght@300&family=Stack+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
+  <script>document.documentElement.classList.add('js');</script>
+
+  <style>
+    /* =========================================================
+       1. DESIGN TOKENS (custom properties)
+       ========================================================= */
+    :root {
+      --bg: #FFFFFF;
+      --surface: #F3F4F6;
+      --ink: #0F1720;
+      --muted: #5B6470;
+      --accent: #D3202E;
+      --accent-dark: #B01824;
+      --accent-ink: #FFFFFF;
+      --control: #C6CCD4;           /* borders inside data-ui fragments only */
+      --error: #B3261E;
+      --success: #1F7A4D;
+
+      /* flat colour fields, one per stage / band */
+      --f1: #DCEBE4;
+      --f2: #DCE7F3;
+      --f3: #F6DDDA;
+      --f4: #E8E6E1;
+      --f5: #E1EBD6;
+
+      --gutter: clamp(16px, 2.5vw, 32px);
+      --gap: clamp(12px, 1.6vw, 24px);
+      --radius: 6px;
+      --nav-h: 68px;
+
+      --font-head: "Stack Sans Headline", "Segoe UI", system-ui, sans-serif;
+      --font-body: "Stack Sans Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+      --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+      --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+      --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+    }
+
+    /* =========================================================
+       2. RESET & BASE
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+    body {
+      margin: 0; font-family: var(--font-body); font-size: var(--step-body); line-height: 1.5;
+      color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3 { font-family: var(--font-head); font-weight: 300; letter-spacing: -0.022em; line-height: 1.05; margin: 0; }
+    p { margin: 0 0 1em; }
+    a { color: inherit; text-decoration: none; }
+    ul, ol { list-style: none; margin: 0; padding: 0; }
+    img { max-width: 100%; display: block; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .wrap { width: 100%; max-width: 1680px; margin: 0 auto; padding: 0 var(--gutter); }
+    .grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); }
+    .section { padding: clamp(80px, 11vw, 168px) 0; }
+    .section-head { font-size: var(--step-head); max-width: 16ch; margin-bottom: clamp(32px, 4vw, 64px); }
+    .section-head span { color: var(--muted); }
+    .small { font-size: var(--step-small); }
+    .muted { color: var(--muted); }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); border: 0; white-space: nowrap;
+    }
+    .skip { position: absolute; left: var(--gutter); top: -60px; z-index: 200; background: var(--ink); color: #fff; padding: .6rem 1rem; border-radius: var(--radius); }
+    .skip:focus { top: 8px; }
+
+    /* Buttons: flat, rectangular, one fill */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+      padding: .95rem 1.6rem; border-radius: var(--radius); border: 0; font-weight: 500;
+      background: var(--accent); color: var(--accent-ink); transition: background .2s, transform .15s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn:disabled { opacity: .75; cursor: wait; }
+    .btn-ink { background: var(--ink); color: #fff; }
+    .btn-ink:hover { background: #26303c; }
+    .link-arrow { font-weight: 500; display: inline-flex; gap: .4rem; align-items: center; border-bottom: 2px solid transparent; transition: border-color .2s, gap .2s; }
+    .link-arrow:hover { border-color: var(--accent); gap: .7rem; }
+    .link-arrow svg { width: 18px; height: 18px; }
+
+    /* Entrance: only hidden when scripting works */
+    .js .fade-in { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; transition-delay: var(--d, 0ms); }
+    .js .fade-in.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .js .fade-in { opacity: 1; transform: none; transition: none; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    /* =========================================================
+       3. NAVIGATION
+       ========================================================= */
+    .site-header { position: fixed; inset: 0 0 auto 0; z-index: 100; height: var(--nav-h); background: var(--bg); transition: transform .3s ease; }
+    .site-header.away { transform: translateY(-100%); visibility: hidden; transition: transform .3s ease, visibility 0s .3s; }
+    .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: var(--font-body); font-weight: 500; font-size: 1.2rem; display: flex; align-items: center; gap: .55rem; letter-spacing: -.01em; }
+    .logo svg { width: 28px; height: 28px; }
+    .nav-toggle { background: none; border: 0; padding: .6rem; display: flex; flex-direction: column; gap: 5px; }
+    .nav-toggle span { width: 24px; height: 2px; background: var(--ink); transition: transform .3s, opacity .3s; }
+    .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-links {
+      position: absolute; top: var(--nav-h); left: 0; right: 0; background: var(--bg);
+      display: flex; flex-direction: column; max-height: 0; overflow: hidden; transition: max-height .35s ease;
+    }
+    .nav-links.open { max-height: 460px; padding-bottom: 1rem; }
+    .nav-links a { padding: .9rem var(--gutter); font-weight: 500; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-links .btn { margin: .5rem var(--gutter) 0; color: var(--accent-ink); }
+    .nav-links .btn:hover { color: var(--accent-ink); }
+
+    /* =========================================================
+       4. HERO + PAYSLIP PLANNER (live fragment)
+       ========================================================= */
+    .hero { padding: calc(var(--nav-h) + clamp(32px, 6vw, 88px)) 0 clamp(64px, 8vw, 120px); }
+    .hero-grid { row-gap: 40px; align-items: start; }
+    .hero-copy { grid-column: 1 / -1; }
+    .hero h1 { font-size: clamp(2.25rem, 1.2rem + 3.4vw, 4.25rem); margin-bottom: 1.25rem; }
+    .hero h1 span { color: var(--muted); }
+    .hero-sub { font-size: var(--step-lead); max-width: 30ch; margin-bottom: 1.75rem; line-height: 1.35; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 1.25rem 1.5rem; align-items: center; }
+    .hero-planner { grid-column: 1 / -1; }
+
+    .planner { background: var(--surface); border-radius: var(--radius); padding: clamp(20px, 2.4vw, 36px); max-width: 640px; font-size: 15px; line-height: 1.45; }
+    .planner h2 { font-family: var(--font-body); font-weight: 500; font-size: 1.15rem; letter-spacing: 0; line-height: 1.3; }
+    .pl-note { color: var(--muted); font-size: 13px; margin: .15rem 0 1.25rem; }
+    .pl-label { display: block; font-weight: 500; margin-bottom: .4rem; }
+    .money { display: flex; align-items: center; background: #fff; border: 1px solid var(--control); border-radius: var(--radius); padding: 0 .9rem; height: 52px; }
+    .money:focus-within { border-color: var(--accent); outline: 3px solid rgba(211,32,46,.25); }
+    .money span { color: var(--muted); font-weight: 500; margin-right: .4rem; }
+    .money input { border: 0; outline: 0; background: none; width: 100%; font-size: 1.4rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; margin: 1rem 0 1.25rem; accent-color: var(--accent); height: 28px; }
+    .slip { margin: 0 0 1.25rem; font-variant-numeric: tabular-nums; }
+    .slip > div { display: flex; justify-content: space-between; gap: 1rem; padding: .45rem 0; }
+    .slip dt { color: var(--muted); }
+    .slip dd { margin: 0; font-weight: 500; }
+    .slip .total { background: #fff; border-radius: var(--radius); padding: .7rem .9rem; margin-top: .3rem; }
+    .slip .total dt { color: var(--ink); font-weight: 500; }
+    .slip .total dd { font-size: 1.25rem; }
+    .slip .minus dd { color: var(--muted); }
+    .pl-modes { border: 0; padding: 0; margin: 0 0 1rem; min-width: 0; }
+    .pl-modes legend { font-weight: 500; padding: 0; margin-bottom: .45rem; }
+    .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: #E6E8EC; padding: 4px; border-radius: var(--radius); }
+    .seg label { position: relative; }
+    .seg input { position: absolute; opacity: 0; inset: 0; }
+    .seg span { display: block; text-align: center; padding: .55rem .25rem; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px; transition: background .2s, color .2s; }
+    .seg input:checked + span { background: var(--ink); color: #fff; }
+    .seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .split-bar { display: flex; height: 18px; border-radius: 4px; overflow: hidden; gap: 3px; margin-bottom: .7rem; }
+    .split-bar i { display: block; transition: flex-basis .45s ease; flex-basis: 0; }
+    .split-bar .s-needs { background: var(--ink); }
+    .split-bar .s-wants { background: #9AA3AF; }
+    .split-bar .s-save { background: var(--accent); }
+    .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-bottom: 1.25rem; font-variant-numeric: tabular-nums; }
+    .legend b { display: block; font-size: 1.1rem; font-weight: 500; }
+    .legend span { color: var(--muted); font-size: 13px; }
+    .facts { display: grid; gap: .6rem; margin: 0; }
+    .facts p { margin: 0; background: #fff; border-radius: var(--radius); padding: .75rem .9rem; }
+    .facts strong { font-weight: 500; }
+    .pl-fine { color: var(--muted); font-size: 13px; margin: 1rem 0 0; }
+
+    /* =========================================================
+       5. WAITING COSTS YOU (full-bleed bars)
+       ========================================================= */
+    .waiting { background: var(--surface); min-height: 90svh; padding: clamp(72px, 9vw, 120px) 0 0; display: flex; flex-direction: column; overflow: hidden; }
+    .waiting-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; align-items: flex-start; }
+    .waiting h2 { position: relative; z-index: 3; font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); font-family: var(--font-body); font-weight: 500; letter-spacing: 0; margin-bottom: .75rem; }
+    .big-num { font-family: var(--font-head); font-weight: 300; letter-spacing: -.04em; line-height: .95; font-size: clamp(5.5rem, 26vw, 10.5rem); font-variant-numeric: tabular-nums; }
+    .big-claim { font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem); margin: .75rem 0 .5rem; }
+    .waiting-note { max-width: 46ch; color: var(--muted); font-size: var(--step-small); }
+    .waiting-ctl { background: #fff; border-radius: var(--radius); padding: 1.1rem 1.25rem; min-width: min(100%, 320px); font-size: 15px; }
+    .waiting-ctl label { display: flex; justify-content: space-between; font-weight: 500; }
+    .waiting-ctl output { font-variant-numeric: tabular-nums; }
+    .waiting-ctl input { margin: .75rem 0 0; }
+    .bars { margin-top: auto; padding-top: 3rem; display: grid; gap: 6px; }
+    .bar { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; outline-offset: 2px; }
+    .bar .fill { display: block; background: #D5D9DF; border-radius: 3px 3px 0 0; transform-origin: bottom left; transition: transform .6s ease, background .2s; }
+    .bar.hot .fill { background: var(--accent); }
+    .bar:hover .fill, .bar:focus-visible .fill { background: var(--ink); }
+    .bar .age { position: absolute; left: 10px; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .bar.hot .age { color: #fff; }
+    .bar .val { position: absolute; font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; opacity: 0; transition: opacity .2s; font-size: 17px; }
+    .bar.show .val, .bar:hover .val, .bar:focus-visible .val { opacity: 1; }
+    @media (max-width: 767px) {
+      .bars { padding-bottom: 2rem; }
+      .bar:not([data-m]) { display: none; }
+      .bar { height: 30px; }
+      .bar .fill { height: 100%; border-radius: 3px; width: calc(var(--p) * 1%); transform: scaleX(0); }
+      .bar.in .fill { transform: none; }
+      .bar .age { top: 50%; translate: 0 -50%; }
+      .bar .val { right: calc(100% - var(--p) * 1% + 10px); top: 50%; translate: 0 -50%; color: var(--ink); }
+      .bar.hot .val { color: #fff; }
+    }
+    @media (min-width: 768px) {
+      .bars { grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; margin-left: calc(var(--gutter) * -1); margin-right: calc(var(--gutter) * -1); padding-top: 4rem; align-items: end; }
+      .bar { height: calc(58vh + 2.5rem); display: flex; align-items: flex-end; }
+      .bar .fill { width: 100%; height: calc(var(--p) * 0.58vh); transform: scaleY(0); transform-origin: bottom; }
+      .bar.in .fill { transform: none; }
+      .bar .age { left: 0; right: 0; bottom: 10px; text-align: center; }
+      .bar .val { left: 50%; translate: -50% 0; bottom: calc(var(--p) * 0.58vh + 8px); }
+      .waiting { min-height: calc(58vh + 400px); }
+    }
+
+    /* =========================================================
+       6. HOW IT WORKS (four fields)
+       ========================================================= */
+    .how { display: grid; grid-template-columns: 1fr; }
+    .stage {
+      position: relative; min-height: 64svh; padding: 28px var(--gutter) 28px; display: flex; flex-direction: column; gap: 28px;
+      justify-content: space-between;
+    }
+    .stage:nth-child(1) { background: var(--f1); }
+    .stage:nth-child(2) { background: var(--f2); }
+    .stage:nth-child(3) { background: var(--f3); }
+    .stage:nth-child(4) { background: var(--f4); }
+    .stage h2 { font-family: var(--font-body); font-weight: 500; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); letter-spacing: -.01em; margin-bottom: 1.25rem; }
+    .stage .clause { font-size: clamp(1.5rem, 1.2rem + 0.9vw, 2rem); line-height: 1.15; letter-spacing: -.015em; max-width: 14ch; margin: 0; }
+    .stage .clause b { font-weight: 500; }
+    .plan-card {
+      width: 260px; max-width: 100%; background: #fff; border-radius: var(--radius); padding: 16px; font-size: 14px; line-height: 1.4;
+      border: 1px solid var(--control); transition: transform .15s ease; align-self: flex-start;
+    }
+    .stage:hover .plan-card { transform: translateY(-6px); }
+    .plan-card h3 { font-family: var(--font-body); font-weight: 500; font-size: 15px; letter-spacing: 0; margin-bottom: 2px; }
+    .plan-card .who { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+    .plan-card dl { margin: 0; }
+    .plan-card dl div { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; }
+    .plan-card dt { color: var(--muted); }
+    .plan-card dd { margin: 0; font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+    .plan-card dd.none { color: var(--muted); font-weight: 400; }
+    .plan-card ul { display: grid; gap: 6px; margin-top: 8px; }
+    .plan-card li { display: flex; gap: 8px; align-items: flex-start; }
+    .plan-card li i { flex: none; width: 16px; height: 16px; border: 1.5px solid var(--control); border-radius: 3px; margin-top: 1px; }
+    .plan-card li.done i { background: var(--ink); border-color: var(--ink); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E"); }
+    .plan-card li.done span { color: var(--muted); text-decoration: line-through; }
+    .tag { display: inline-block; font-size: 12.5px; font-weight: 500; padding: 2px 8px; border-radius: 4px; background: var(--surface); }
+    .tag.ok { background: var(--success); color: #fff; }
+    .plan-card .closed { margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; background: none; }
+    .stage-main { display: flex; flex-direction: column; gap: 28px; }
+    @media (min-width: 768px) {
+      .how { grid-template-columns: repeat(4, 1fr); }
+      .stage { min-height: 84svh; padding: 28px 24px; justify-content: flex-start; }
+      .stage-main { margin-top: 0; }
+      .stage .plan-card { position: absolute; left: 50%; top: 38%; translate: -50% 0; align-self: auto; }
+      .stage:hover .plan-card { transform: translateY(-6px); }
+      .stage .clause { position: absolute; left: 24px; right: 24px; bottom: 28px; }
+      .stage-main { gap: 0; }
+    }
+    @media (min-width: 768px) and (max-width: 1100px) {
+      .plan-card { width: 220px; }
+    }
+
+    /* =========================================================
+       7. SINGAPORE RULES (picture tiles)
+       ========================================================= */
+    .rules-grid { row-gap: clamp(40px, 5vw, 80px); }
+    .rule { grid-column: 1 / -1; }
+    .rule img { width: 100%; height: auto; object-fit: cover; border-radius: var(--radius); margin-bottom: 1.25rem; }
+    .rule h3 { font-size: var(--step-lead); font-family: var(--font-body); font-weight: 500; letter-spacing: -.01em; line-height: 1.2; margin-bottom: .6rem; max-width: 22ch; }
+    .rule p { max-width: 42ch; margin: 0; }
+    .rule.a img { aspect-ratio: 4 / 3; }
+    .rule.b img { aspect-ratio: 4 / 3; }
+    .rule.c img { aspect-ratio: 4 / 3; }
+    .rule.d img { aspect-ratio: 4 / 3; }
+    @media (min-width: 900px) {
+      .rule.a { grid-column: 1 / span 7; } .rule.a img { aspect-ratio: 16 / 10; }
+      .rule.b { grid-column: 9 / span 4; } .rule.b img { aspect-ratio: 4 / 5; }
+      .rule.c { grid-column: 1 / span 4; } .rule.c img { aspect-ratio: 4 / 5; }
+      .rule.d { grid-column: 6 / span 7; } .rule.d img { aspect-ratio: 16 / 10; }
+      .rule.b, .rule.c { align-self: end; }
+    }
+
+    /* =========================================================
+       8. WHAT WE DO (sentences with switches)
+       ========================================================= */
+    .services { padding-bottom: 0; }
+    .services .section-head { max-width: 18ch; }
+    .band { background: var(--bg); transition: background .35s ease; }
+    .band-in { min-height: 132px; padding-top: 20px; padding-bottom: 20px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--gap); }
+    .band-txt { font-size: clamp(1.5rem, 0.7rem + 3.6vw, 3.75rem); font-family: var(--font-head); font-weight: 300; letter-spacing: -.022em; line-height: 1.08; color: var(--muted); margin: 0; transition: color .3s; max-width: 22ch; }
+    .band-more { grid-column: 1; max-height: 0; overflow: hidden; opacity: 0; transition: max-height .4s ease, opacity .3s ease; margin: 0; max-width: 62ch; font-size: 15px; }
+    .band.on .band-txt { color: var(--ink); }
+    .band.on .band-more { max-height: 200px; opacity: 1; margin-top: .75rem; font-size: 15px; }
+    .band:nth-child(1).on { background: var(--f1); }
+    .band:nth-child(2).on { background: var(--f2); }
+    .band:nth-child(3).on { background: var(--f3); }
+    .band:nth-child(4).on { background: var(--f4); }
+    .band:nth-child(5).on { background: var(--f5); }
+    .tgl { grid-row: 1; grid-column: 2; font-size: clamp(26px, 3vw, 44px); width: 1.9em; height: 1em; border-radius: 1em; border: 0; background: var(--control); position: relative; padding: 0; transition: background .25s; min-width: 44px; }
+    .tgl::after { content: ""; position: absolute; top: .09em; left: .09em; width: .82em; height: .82em; border-radius: 50%; background: #fff; transition: transform .25s ease; }
+    .tgl[aria-checked="true"] { background: var(--accent); }
+    .tgl[aria-checked="true"]::after { transform: translateX(.9em); }
+    @media (min-width: 768px) {
+      .band-in { min-height: 20vh; }
+      .band-more { font-size: 17px; }
+      .band.on .band-more { font-size: 17px; }
+    }
+
+    /* =========================================================
+       9. A NOTE FOR YOUR FIRST PAYSLIP (letter)
+       ========================================================= */
+    .letter-grid { row-gap: 40px; }
+    .letter-grid > h2 { grid-column: 1 / -1; font-size: var(--step-head); max-width: 12ch; }
+    .letter { grid-column: 1 / -1; max-width: 38ch; }
+    .letter .open { font-family: var(--font-body); font-weight: 500; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height: 1.2; letter-spacing: -.015em; margin-bottom: 1.5rem; }
+    .letter p { margin-bottom: 1.25rem; font-size: 1.1875rem; line-height: 1.55; }
+    .letter .sign { margin-top: 2.5rem; }
+    .letter .sign b { display: block; font-weight: 500; }
+    @media (min-width: 900px) {
+      .letter-grid > h2 { grid-column: 1 / span 5; }
+      .letter { grid-column: 7 / span 5; }
+    }
+
+    /* =========================================================
+       10. FAQ (question index, one answer)
+       ========================================================= */
+    .faq { background: var(--surface); }
+    .faq-grid { row-gap: 32px; }
+    .faq-list { grid-column: 1 / -1; display: grid; gap: 6px; }
+    .faq-list li { display: block; }
+    .q { display: flex; align-items: flex-start; gap: 14px; width: 100%; text-align: left; background: none; border: 0; padding: 9px 0; font-size: 1.125rem; color: var(--muted); transition: color .2s; }
+    .q::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--control); margin-top: .6em; transition: background .2s; }
+    .q[aria-expanded="true"] { color: var(--ink); }
+    .q[aria-expanded="true"]::before { background: var(--accent); }
+    .q:hover { color: var(--ink); }
+    .a-inline { display: none; margin: 0 0 .5rem 22px; font-size: 1.1875rem; max-width: 46ch; }
+    .q[aria-expanded="true"] + .a-inline { display: block; }
+    .faq-pane { display: none; }
+    @media (min-width: 900px) {
+      .faq-list { grid-column: 1 / span 5; }
+      .faq-list .a-inline, .q[aria-expanded="true"] + .a-inline { display: none; }
+      .faq-pane { display: block; grid-column: 7 / span 6; position: sticky; top: 120px; align-self: start; }
+      .faq-pane p { font-size: clamp(1.5rem, 1.1rem + 1.2vw, 1.75rem); line-height: 1.3; max-width: 30ch; margin: 0; transition: opacity .15s ease; }
+      .faq-pane p.swap { opacity: 0; }
+    }
+
+    /* =========================================================
+       11. CLOSING TILES (crossfade photo + action)
+       ========================================================= */
+    .cta { padding: clamp(80px, 10vw, 140px) 0; overflow: hidden; }
+    .cta-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .tile { border-radius: var(--radius); min-height: 120px; position: relative; overflow: hidden; }
+    .tile-main { background: var(--accent); color: var(--accent-ink); padding: clamp(24px, 3vw, 40px); display: flex; flex-direction: column; justify-content: center; gap: 1rem; min-height: 300px; }
+    .tile-main h2 { font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem); }
+    .tile-main p { font-size: 17px; margin: 0; max-width: 40ch; }
+    .tile-main .cta-copy { display: grid; gap: 1rem; align-content: center; }
+    .tile-main .cta-act { display: grid; gap: .25rem; align-content: center; }
+    .tile-main .cta-copy { display: grid; gap: 1rem; align-content: center; }
+    .tile-main .cta-act { display: grid; gap: .25rem; align-content: center; }
+    .tile-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.6s ease; }
+    .tile-photo img.on { opacity: 1; }
+    .tile-video { background: var(--f1); }
+    .tile-video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .cta-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cta-form { position: relative; max-width: 460px; }
+    .cta-form input { width: 100%; height: 60px; border-radius: var(--radius); border: 0; background: #fff; color: var(--ink); padding: 0 64px 0 18px; font-size: 16px; }
+    .cta-form input:focus { outline: 3px solid var(--ink); outline-offset: 2px; }
+    .cta-form button { position: absolute; right: 8px; top: 8px; width: 44px; height: 44px; border-radius: 4px; border: 0; background: var(--ink); color: #fff; display: grid; place-items: center; transition: background .2s, transform .15s; }
+    .cta-form button:hover { background: #26303c; }
+    .cta-form button:active { transform: scale(.94); }
+    .cta-form svg { width: 20px; height: 20px; }
+    .cta-msg { min-height: 1.4em; font-size: 14px; margin: .25rem 0 0; }
+    @media (min-width: 900px) {
+      .cta-row { grid-template-columns: minmax(0, 2fr) minmax(0, 8fr) minmax(0, 2fr); margin: 0 -60px; }
+      .tile { min-height: 360px; }
+      .tile-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+      .tile-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+      .cta-pair { display: contents; }
+      .cta-row .tile-photo { order: -1; }
+    }
+
+    /* =========================================================
+       12. ENQUIRY FORM
+       ========================================================= */
+    .contact-grid { row-gap: 48px; }
+    .contact-grid > .contact-info { grid-column: 1 / -1; }
+    .contact-grid > .form-card { grid-column: 1 / -1; }
+    .contact h2 { font-size: var(--step-head); max-width: 14ch; margin-bottom: 1.25rem; }
+    .contact-info p.lead { max-width: 34ch; font-size: var(--step-lead); line-height: 1.35; margin-bottom: 2rem; }
+    .info-list { display: grid; gap: 1.25rem; }
+    .info-list div { display: grid; gap: 2px; }
+    .info-list dt { color: var(--muted); font-size: 14px; }
+    .info-list dd { margin: 0; font-size: 17px; }
+    .info-list a:hover { color: var(--accent); }
+    dl.info-list { margin: 0; }
+    .form-card { background: var(--surface); border-radius: var(--radius); padding: clamp(20px, 3vw, 40px); }
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 0 var(--gap); }
+    .field { margin-bottom: 1.1rem; }
+    .field label, .field legend { display: block; font-weight: 500; font-size: 15px; margin-bottom: .4rem; padding: 0; }
+    .req { color: var(--error); }
+    .field input[type="text"], .field input[type="email"], .field input[type="tel"], .field select, .field textarea {
+      width: 100%; padding: .85rem 1rem; border: 1px solid transparent; border-radius: var(--radius); background: #fff; font-size: 16px; transition: border-color .2s, box-shadow .2s;
+    }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: 3px solid rgba(211,32,46,.3); border-color: var(--accent); }
+    .field .invalid { border-color: var(--error) !important; }
+    .error-msg { color: var(--error); font-size: 14px; margin-top: .3rem; display: block; }
+    fieldset { border: 0; margin: 0 0 1.1rem; padding: 0; min-width: 0; }
+    .radio-group { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; }
+    .radio-group label, .consent label { display: flex; align-items: center; gap: .5rem; font-weight: 400; cursor: pointer; margin: 0; }
+    .radio-group input, .consent input { accent-color: var(--accent); width: 18px; height: 18px; margin: 0; flex: none; }
+    .consent label { align-items: flex-start; font-size: 15px; }
+    .form-card .btn { width: 100%; margin-top: .5rem; }
+    .spinner { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; display: none; }
+    .btn.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .success { text-align: center; padding: 2.5rem 1rem; }
+    .success .tick { width: 72px; height: 72px; border-radius: 50%; background: var(--success); color: #fff; display: grid; place-items: center; margin: 0 auto 1.25rem; }
+    .success .tick svg { width: 36px; height: 36px; }
+    .success h3 { font-size: 2rem; margin-bottom: .75rem; }
+    @media (min-width: 768px) { .form-row { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1024px) {
+      .contact-grid > .contact-info { grid-column: 1 / span 5; }
+      .contact-grid > .form-card { grid-column: 7 / span 6; }
+    }
+
+    /* =========================================================
+       13. FOOTER (tiles)
+       ========================================================= */
+    .site-footer { padding: 8px 8px 8px; }
+    .f-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    .f-tile { background: var(--surface); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; min-height: 200px; }
+    .f-word { grid-column: 1 / -1; order: 1; background: var(--ink); color: #fff; min-height: 160px; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 300; font-size: clamp(2.25rem, 12vw, 3.5rem); letter-spacing: -.03em; }
+    .f-join { grid-column: 1 / -1; order: 2; background: var(--accent); color: #fff; min-height: 150px; font-size: 1.75rem; font-family: var(--font-head); font-weight: 300; letter-spacing: -.02em; line-height: 1.1; }
+    .f-nav { order: 3; } .f-mail { order: 4; } .f-time { order: 5; } .f-state { order: 6; }
+    .f-join svg { width: 40px; height: 40px; align-self: flex-end; transition: transform .2s; }
+    .f-join:hover svg { transform: translateX(6px); }
+    .f-state p { font-size: 1.1875rem; margin: 0; line-height: 1.3; }
+    .f-state .legal { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .f-nav ul { display: grid; gap: .35rem; font-size: 16px; }
+    .f-nav a:hover, .f-mail a:hover { color: var(--accent); }
+    .f-mail a { font-size: 1.1rem; word-break: break-word; }
+    .f-time .t { font-size: 1.75rem; font-family: var(--font-head); font-weight: 300; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+    .f-time .c { color: var(--muted); font-size: 15px; }
+    .credits { font-size: 13px; line-height: 1.55; color: var(--muted); padding: 24px var(--gutter) 24px; max-width: 1100px; margin: 0; }
+    .credits a { text-decoration: underline; text-underline-offset: 2px; }
+    @media (min-width: 900px) {
+      .site-footer { padding: 12px; }
+      .f-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 8px; }
+      .f-tile { min-height: 220px; padding: 24px; }
+      .f-state { grid-column: 1 / span 4; order: 1; }
+      .f-nav { grid-column: 5 / span 3; order: 2; }
+      .f-time { grid-column: 8 / span 2; order: 3; }
+      .f-mail { grid-column: 10 / span 3; order: 4; }
+      .f-word { grid-column: 1 / span 8; order: 5; min-height: 320px; font-size: 9vw; }
+      .f-join { grid-column: 9 / span 4; order: 6; min-height: 320px; font-size: 1.75rem; }
+    }
+
+    /* Back to top */
+    .to-top {
+      position: fixed; right: 20px; bottom: 20px; width: 48px; height: 48px; border-radius: var(--radius); border: 0;
+      background: var(--ink); color: #fff; display: grid; place-items: center;
+      opacity: 0; visibility: hidden; transform: translateY(12px);
+      transition: opacity .3s, visibility .3s, transform .3s, background .2s; z-index: 90;
+    }
+    .to-top.show { opacity: 1; visibility: visible; transform: none; }
+    .to-top:hover { background: var(--accent); }
+    .to-top svg { width: 22px; height: 22px; }
+
+    /* =========================================================
+       14. BREAKPOINTS (mobile-first)
+       ========================================================= */
+    @media (min-width: 1024px) {
+      .nav-toggle { display: none; }
+      .nav-links { position: static; flex-direction: row; align-items: center; max-height: none; overflow: visible; background: none; gap: .25rem; padding: 0; }
+      .nav-links.open { padding: 0; }
+      .nav-links a { padding: .5rem .85rem; }
+      .nav-links .btn { margin: 0 0 0 .75rem; padding: .7rem 1.2rem; }
+      .hero-copy { grid-column: 1 / span 5; padding-top: 24px; }
+      .hero-planner { grid-column: 7 / span 6; }
+      .planner { margin-left: auto; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#planner" class="skip">Skip to the payslip planner</a>
+
+  <!-- ===================== NAVIGATION ===================== -->
+  <header class="site-header">
+    <nav class="wrap nav-inner" aria-label="Main navigation">
+      <a href="#home" class="logo" aria-label="Horizon Wealth Planning home">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="19" r="8" fill="#D3202E"/><rect x="2" y="23" width="28" height="7" fill="#fff"/><path d="M2 24h28" stroke="#0F1720" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Horizon Wealth
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#home">Payslip planner</a>
+        <a href="#waiting">Why start now</a>
+        <a href="#how">How it works</a>
+        <a href="#services">What we do</a>
+        <a href="#faq">Questions</a>
+        <a href="#contact" class="btn">Book a free chat</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== HERO + LIVE PAYSLIP ===================== -->
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="wrap">
+        <div class="grid12 hero-grid">
+          <div class="hero-copy">
+            <h1 id="hero-title">Make your first payslip count.</h1>
+            <p class="hero-sub fade-in" style="--d:80ms">See what CPF and tax take, then decide what every dollar of your Singapore salary should do.</p>
+            <div class="hero-actions fade-in" style="--d:160ms">
+              <a href="#contact" class="btn">Book a free 30-minute chat</a>
+              <a href="#waiting" class="link-arrow">Why starting early matters
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-planner fade-in" style="--d:120ms">
+            <div class="planner" id="planner" data-ui>
+              <h2>Your payslip, explained</h2>
+              <p class="pl-note">Singapore Citizen or PR, age 55 and below. Move the slider to try your own salary.</p>
+
+              <label class="pl-label" for="salary">Monthly gross salary</label>
+              <div class="money"><span>S$</span><input id="salary" type="number" inputmode="numeric" min="0" max="30000" step="100" value="4500"></div>
+              <input id="salaryRange" type="range" min="2000" max="15000" step="100" value="4500" aria-label="Adjust monthly gross salary">
+
+              <dl class="slip">
+                <div><dt>Gross salary</dt><dd id="plGross">S$4,500</dd></div>
+                <div class="minus"><dt>Your CPF contribution (20%)</dt><dd id="plCpf">-S$900</dd></div>
+                <div><dt>Take-home pay</dt><dd id="plTake">S$3,600</dd></div>
+                <div class="minus"><dt>Income tax to set aside (est., paid yearly)</dt><dd id="plTax">-S$59</dd></div>
+                <div class="total"><dt>Left to plan with</dt><dd id="plPlan">S$3,541</dd></div>
+              </dl>
+
+              <fieldset class="pl-modes">
+                <legend>How do you want to split it?</legend>
+                <div class="seg" id="plModes">
+                  <label><input type="radio" name="mode" value="50,30,20" checked><span>Balanced</span></label>
+                  <label><input type="radio" name="mode" value="50,20,30"><span>Saver</span></label>
+                  <label><input type="radio" name="mode" value="60,30,10"><span>Tight month</span></label>
+                </div>
+              </fieldset>
+
+              <div class="split-bar" aria-hidden="true"><i class="s-needs" id="barNeeds"></i><i class="s-wants" id="barWants"></i><i class="s-save" id="barSave"></i></div>
+              <div class="legend" id="plLegend">
+                <div><b id="lgNeeds">S$1,770</b><span>Needs <em id="pcNeeds" style="font-style:normal">50%</em></span></div>
+                <div><b id="lgWants">S$1,062</b><span>Wants <em id="pcWants" style="font-style:normal">30%</em></span></div>
+                <div><b id="lgSave">S$708</b><span>Save and invest <em id="pcSave" style="font-style:normal">20%</em></span></div>
+              </div>
+
+              <div class="facts" role="status" aria-live="polite">
+                <p id="factFund"></p>
+                <p id="factCpf"></p>
+              </div>
+              <p class="pl-fine">An estimate for learning, not advice. Uses 2026 CPF rates and the Ordinary Wage ceiling of S$8,000, resident tax rates with Earned Income Relief and CPF relief, and no bonuses.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== THE COST OF WAITING ===================== -->
+    <section class="waiting" id="waiting" aria-labelledby="waiting-title">
+      <div class="wrap">
+        <div class="waiting-top">
+          <div>
+            <h2 id="waiting-title" class="fade-in">The cost of waiting</h2>
+            <div class="big-num fade-in" id="gapNum" aria-live="polite">S$0</div>
+            <p class="big-claim fade-in">Starting at 25, not 35.</p>
+            <p class="waiting-note fade-in" id="gapNote">Illustration only. Saving a fixed amount every month at an assumed 4% a year, compounded monthly, until age 65. Real returns vary and are not guaranteed.</p>
+          </div>
+          <div class="waiting-ctl fade-in" data-ui>
+            <label for="monthly">Saved or invested each month <output id="monthlyOut" for="monthly">S$300</output></label>
+            <input type="range" id="monthly" min="100" max="1000" step="50" value="300">
+          </div>
+        </div>
+      </div>
+      <ol class="bars wrap" id="bars" data-ui aria-label="Value at age 65 by the age you start saving"></ol>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="stage">
+        <div class="stage-main">
+          <h2 id="how-title">How it works</h2>
+          <div class="plan-card" data-ui>
+            <h3>Your plan</h3>
+            <p class="who">Sample: Jia Hui, 26, analyst</p>
+            <dl>
+              <div><dt>Take-home</dt><dd>S$3,600</dd></div>
+              <div><dt>Goals</dt><dd class="none">None yet</dd></div>
+              <div><dt>Owner</dt><dd class="none">Unassigned</dd></div>
+              <div><dt>Review</dt><dd class="none">Not set</dd></div>
+            </dl>
+          </div>
+        </div>
+        <p class="clause"><b>First</b> we look at your numbers.</p>
+      </div>
+      <div class="stage">
+        <div class="plan-card" data-ui>
+          <h3>Your plan</h3>
+          <p class="who">Sample: Jia Hui, 26, analyst</p>
+          <dl>
+            <div><dt>Take-home</dt><dd>S$3,600</dd></div>
+            <div><dt>Goal</dt><dd>Safety net S$10,620</dd></div>
+            <div><dt>Owner</dt><dd>You, with your planner</dd></div>
+            <div><dt>Review</dt><dd>Every 6 months</dd></div>
+          </dl>
+        </div>
+        <p class="clause"><b>Then</b> you pick your goals.</p>
+      </div>
+      <div class="stage">
+        <div class="plan-card" data-ui>
+          <h3>Your plan</h3>
+          <p class="who">Sample: Jia Hui, 26, analyst</p>
+          <ul>
+            <li class="done"><i></i><span>Open a savings pot</span></li>
+            <li class="done"><i></i><span>Check hospital cover</span></li>
+            <li><i></i><span>Top up CPF Special Account</span></li>
+            <li><i></i><span>Start S$300 a month investing</span></li>
+          </ul>
+        </div>
+        <p class="clause"><b>Then</b> we build the safety net.</p>
+      </div>
+      <div class="stage">
+        <div class="plan-card" data-ui>
+          <h3>Your plan</h3>
+          <p class="who">Sample: Jia Hui, 26, analyst</p>
+          <dl>
+            <div><dt>Safety net</dt><dd>S$10,620</dd></div>
+            <div><dt>Saving</dt><dd>S$708 a month</dd></div>
+            <div><dt>Time taken</dt><dd>15 months</dd></div>
+          </dl>
+          <div class="closed"><span class="tag ok">On track</span><span class="small muted">Review in June</span></div>
+        </div>
+        <p class="clause"><b>Then</b> it runs on autopilot.</p>
+      </div>
+    </section>
+
+    <!-- ===================== SINGAPORE RULES ===================== -->
+    <section class="section" id="singapore" aria-labelledby="sg-title">
+      <div class="wrap">
+        <h2 class="section-head fade-in" id="sg-title">Singapore money rules <span>worth knowing early.</span></h2>
+        <div class="grid12 rules-grid">
+          <article class="rule a fade-in">
+            <img src="assets/hdb-kovan-jpg.jpg" alt="HDB flats in the Kovan estate" width="1600" height="1200" loading="lazy">
+            <h3>Your CPF can help you buy your first home.</h3>
+            <p>Ordinary Account savings can go towards an HDB flat or private home, for the down payment and the monthly loan, within limits. Work out the cash you need now, not when the keys are near.</p>
+          </article>
+          <article class="rule b fade-in" style="--d:80ms">
+            <img src="assets/mrt-commuters-jpg.jpg" alt="Commuters on a North-South Line MRT train" width="1600" height="900" loading="lazy">
+            <h3>Know what your health cover actually covers.</h3>
+            <p>MediShield Life covers every Singapore Citizen and PR for life. Integrated Shield Plans add higher ward and private hospital options on top.</p>
+          </article>
+          <article class="rule c fade-in">
+            <img src="assets/cbd-esplanade-jpg.jpg" alt="The Singapore CBD skyline seen from the Esplanade at dusk" width="1600" height="1067" loading="lazy">
+            <h3>The first S$20,000 of taxable income is tax-free.</h3>
+            <p>For tax residents, the first S$20,000 of chargeable income is taxed at 0%, and CPF contributions and reliefs lower it further.</p>
+          </article>
+          <article class="rule d fade-in" style="--d:80ms">
+            <img src="assets/hawker-seah-im-jpg.jpg" alt="Diners at Seah Im Food Centre, a Singapore hawker centre" width="1600" height="1200" loading="lazy">
+            <h3>CPF LIFE pays you a monthly income from 65.</h3>
+            <p>Your payout depends on your Retirement Account savings, so what you build in your twenties shapes the lifestyle you can afford at 65 and beyond. You can choose to defer payouts up to age 70.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== WHAT WE DO ===================== -->
+    <section class="section services" id="services" aria-labelledby="svc-title">
+      <div class="wrap">
+        <h2 class="section-head fade-in" id="svc-title">What we help you do <span>with your pay.</span></h2>
+      </div>
+      <div id="bands">
+        <div class="band on">
+          <div class="wrap band-in">
+            <p class="band-txt" id="b1">See exactly where your salary leaks.</p>
+            <button class="tgl" role="switch" aria-checked="true" aria-labelledby="b1" data-ui></button>
+            <p class="band-more">S$5 a day on drinks and delivery fees is S$150 a month, or S$1,800 a year. We find yours and decide what stays.</p>
+          </div>
+        </div>
+        <div class="band">
+          <div class="wrap band-in">
+            <p class="band-txt" id="b2">Build a six-month safety net first.</p>
+            <button class="tgl" role="switch" aria-checked="false" aria-labelledby="b2" data-ui></button>
+            <p class="band-more">If your essentials cost S$2,000 a month, the target is S$12,000. Saving S$500 a month gets you there in 24 months.</p>
+          </div>
+        </div>
+        <div class="band">
+          <div class="wrap band-in">
+            <p class="band-txt" id="b3">Check your hospital and life cover.</p>
+            <button class="tgl" role="switch" aria-checked="false" aria-labelledby="b3" data-ui></button>
+            <p class="band-more">Term life and critical illness plans cost less the younger and healthier you are when you start. We compare options and explain the fine print.</p>
+          </div>
+        </div>
+        <div class="band on">
+          <div class="wrap band-in">
+            <p class="band-txt" id="b4">Put your CPF to work, not to sleep.</p>
+            <button class="tgl" role="switch" aria-checked="true" aria-labelledby="b4" data-ui></button>
+            <p class="band-more">Your Ordinary Account earns up to 2.5% a year, Special and MediSave up to 4%, with 1% extra on your first S$60,000 combined (up to S$20,000 from OA). Cash top-ups to your own SA can also earn up to S$8,000 of tax relief.</p>
+          </div>
+        </div>
+        <div class="band">
+          <div class="wrap band-in">
+            <p class="band-txt" id="b5">Invest small, steady and diversified.</p>
+            <button class="tgl" role="switch" aria-checked="false" aria-labelledby="b5" data-ui></button>
+            <p class="band-more" id="b5more">S$300 a month at an assumed 4% a year grows to about S$355,000 by 65 if you start at 25. We help you choose low-cost, diversified options that match your risk comfort.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== LETTER ===================== -->
+    <section class="section" id="note" aria-labelledby="note-title">
+      <div class="wrap">
+        <div class="grid12 letter-grid">
+          <h2 id="note-title" class="fade-in">A note for your first payslip.</h2>
+          <div class="letter fade-in" style="--d:100ms">
+            <p class="open">Nobody teaches you what to do with your first payslip.</p>
+            <p>You worked for years to land this job. Then the salary arrives, CPF takes its share, rent and meals and the sale on your phone take theirs, and by the 25th you wonder where it all went.</p>
+            <p>That feeling is not a character flaw. It is what happens when money has no plan. The good news is that the earliest years are the cheapest to fix: a small habit at 24 does more work than a big effort at 34, because time does the heavy lifting.</p>
+            <p>You do not need to be rich, or to understand every product. You need to know your numbers, protect yourself from the big surprises, and give every dollar a job. That is all we ask of you on the first call. We will do the rest with you.</p>
+            <p class="sign"><b>The Horizon team</b>Financial planners, Singapore</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FAQ ===================== -->
+    <section class="section faq" id="faq" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="grid12 faq-grid">
+          <ul class="faq-list" id="faqList">
+            <li><h2 id="faq-title" class="muted" style="font-family:var(--font-body);font-weight:400;font-size:1.125rem;letter-spacing:0;padding-bottom:.6rem">Questions</h2></li>
+            <li><button class="q" aria-expanded="true" data-a="A common starting point is 20% of what is left after CPF and tax. Start with whatever you can keep up, even 10%, and raise it each time your pay does."><span>How much should I save from my first pay?</span></button><p class="a-inline">A common starting point is 20% of what is left after CPF and tax. Start with whatever you can keep up, even 10%, and raise it each time your pay does.</p></li>
+            <li><button class="q" aria-expanded="false" data-a="CPF is a compulsory savings scheme for working Citizens and PRs. It is meant for housing, healthcare and retirement, so most of it stays put until your later years, though you can use some toward a home."><span>What is CPF, and can I withdraw it?</span></button><p class="a-inline">CPF is a compulsory savings scheme for working Citizens and PRs. It is meant for housing, healthcare and retirement, so most of it stays put until your later years, though you can use some toward a home.</p></li>
+            <li><button class="q" aria-expanded="false" data-a="A basic layer, yes. MediShield Life is your baseline. Consider a hospital top-up, term life if anyone depends on you, and critical illness cover. Premiums are lower when you start young."><span>Do I need insurance if I am young and healthy?</span></button><p class="a-inline">A basic layer, yes. MediShield Life is your baseline. Consider a hospital top-up, term life if anyone depends on you, and critical illness cover. Premiums are lower when you start young.</p></li>
+            <li><button class="q" aria-expanded="false" data-a="Build a small safety net first. Then compare your loan's interest rate with a realistic investment return. If the loan rate is high, repaying it is a guaranteed gain."><span>Should I clear my study loan or invest first?</span></button><p class="a-inline">Build a small safety net first. Then compare your loan's interest rate with a realistic investment return. If the loan rate is high, repaying it is a guaranteed gain.</p></li>
+            <li><button class="q" aria-expanded="false" data-a="No. Time is the biggest advantage you have. Start small and regular, spread across many assets, and only with money you will not need for five years or more."><span>Is it too early to start investing?</span></button><p class="a-inline">No. Time is the biggest advantage you have. Start small and regular, spread across many assets, and only with money you will not need for five years or more.</p></li>
+            <li><button class="q" aria-expanded="false" data-a="Your CPF savings do not follow your will. They go to whoever you nominate with the CPF Board, so nominate early and update it after big life changes."><span>Do I need a will or a CPF nomination?</span></button><p class="a-inline">Your CPF savings do not follow your will. They go to whoever you nominate with the CPF Board, so nominate early and update it after big life changes.</p></li>
+            <li><button class="q" aria-expanded="false" data-a="Nothing. The first 30-minute chat is free and without obligation. We look at your numbers, answer your questions and tell you honestly if we can help."><span>What does the first meeting cost?</span></button><p class="a-inline">Nothing. The first 30-minute chat is free and without obligation. We look at your numbers, answer your questions and tell you honestly if we can help.</p></li>
+          </ul>
+          <div class="faq-pane" aria-live="polite"><p id="faqPane">A common starting point is 20% of what is left after CPF and tax. Start with whatever you can keep up, even 10%, and raise it each time your pay does.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CLOSING TILES ===================== -->
+    <section class="cta" id="join" aria-labelledby="join-title">
+      <div class="wrap">
+        <div class="cta-row">
+          <div class="tile tile-photo" id="xfade" aria-hidden="true">
+            <img class="on" src="assets/skyline-sunset-jpg.jpg" alt="" width="1600" height="1067" loading="lazy">
+            <img src="assets/marina-bay-dusk-jpg.jpg" alt="" width="1600" height="602" loading="lazy">
+            <img src="assets/skyline-dusk-jpg.jpg" alt="" width="1600" height="1064" loading="lazy">
+          </div>
+          <div class="tile tile-main">
+            <div class="cta-copy"><h2 id="join-title">Make your first plan.</h2>
+            <p>Leave your email and we will set up a free 30-minute chat about your pay, your goals and your next step.</p></div>
+            <div class="cta-act"><form class="cta-form" id="ctaForm" novalidate>
+              <label for="ctaEmail" class="sr-only">Your email address</label>
+              <input type="email" id="ctaEmail" placeholder="you@example.com" autocomplete="email">
+              <button type="submit" aria-label="Continue to the booking form">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </form>
+            <p class="cta-msg" id="ctaMsg" role="status"></p></div>
+          </div>
+          <div class="cta-pair">
+            <div class="tile tile-video" aria-hidden="true"><video id="loopVid" autoplay muted loop playsinline preload="metadata" poster="assets/merlion-timelapse-poster.jpg" width="854" height="480"><source src="assets/merlion-timelapse.webm" type="video/webm"></video></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ENQUIRY FORM ===================== -->
+    <section class="section contact" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <div class="grid12 contact-grid">
+          <div class="contact-info">
+            <h2 id="contact-title">Book your free chat.</h2>
+            <p class="lead">Tell us a little about where you are. A planner will reply within one business day.</p>
+            <dl class="info-list">
+              <div><dt>Email</dt><dd><a href="mailto:hello@horizonwealth.example">hello@horizonwealth.example</a></dd></div>
+              <div><dt>Phone and WhatsApp</dt><dd><a href="tel:+6561234567">+65 6123 4567</a></dd></div>
+              <div><dt>Office</dt><dd>88 Market Street, #25-01, Capital Tower<br>Singapore 048948</dd></div>
+              <div><dt>Hours</dt><dd>Mon to Fri 9am to 6pm, Sat 10am to 1pm<br>Closed Sundays and public holidays</dd></div>
+            </dl>
+          </div>
+
+          <div class="form-card" id="formCard">
+            <form id="enquiryForm" novalidate>
+              <div class="form-row">
+                <div class="field">
+                  <label for="fullName">Full name <span class="req">*</span></label>
+                  <input type="text" id="fullName" name="fullName" autocomplete="name" aria-describedby="fullName-err">
+                  <span class="error-msg" id="fullName-err" role="alert"></span>
+                </div>
+                <div class="field">
+                  <label for="email">Email <span class="req">*</span></label>
+                  <input type="email" id="email" name="email" autocomplete="email" aria-describedby="email-err">
+                  <span class="error-msg" id="email-err" role="alert"></span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="phone">Mobile number <span class="req">*</span></label>
+                  <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder="e.g. 91234567" aria-describedby="phone-err">
+                  <span class="error-msg" id="phone-err" role="alert"></span>
+                </div>
+                <div class="field">
+                  <label for="stage">Where are you now? <span class="req">*</span></label>
+                  <select id="stage" name="stage" aria-describedby="stage-err">
+                    <option value="">Select…</option>
+                    <option>Just got my first job</option>
+                    <option>Working for 1 to 3 years</option>
+                    <option>Working for 3 to 6 years</option>
+                    <option>Saving for a home or wedding</option>
+                    <option>Switching jobs or going freelance</option>
+                    <option>Something else</option>
+                  </select>
+                  <span class="error-msg" id="stage-err" role="alert"></span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="interest">What do you want help with? <span class="req">*</span></label>
+                <select id="interest" name="interest" aria-describedby="interest-err">
+                  <option value="">Select…</option>
+                  <option>Budgeting and my first-pay plan</option>
+                  <option>Emergency fund and savings</option>
+                  <option>Insurance review</option>
+                  <option>CPF planning</option>
+                  <option>Starting to invest</option>
+                  <option>Saving for a home</option>
+                  <option>Tax planning</option>
+                  <option>Not sure yet</option>
+                </select>
+                <span class="error-msg" id="interest-err" role="alert"></span>
+              </div>
+              <fieldset class="field" aria-describedby="contactMethod-err">
+                <legend>Best way to reach you <span class="req">*</span></legend>
+                <div class="radio-group">
+                  <label><input type="radio" name="contactMethod" value="WhatsApp"> WhatsApp</label>
+                  <label><input type="radio" name="contactMethod" value="Phone"> Phone</label>
+                  <label><input type="radio" name="contactMethod" value="Email"> Email</label>
+                </div>
+                <span class="error-msg" id="contactMethod-err" role="alert"></span>
+              </fieldset>
+              <div class="field">
+                <label for="message">Anything we should know?</label>
+                <textarea id="message" name="message" placeholder="Your goals, worries or questions (optional)"></textarea>
+              </div>
+              <div class="field consent">
+                <label><input type="checkbox" id="consent" name="consent" aria-describedby="consent-err"> <span>I agree to be contacted by Horizon Wealth Planning about my enquiry. <span class="req">*</span></span></label>
+                <span class="error-msg" id="consent-err" role="alert"></span>
+              </div>
+              <button type="submit" class="btn" id="submitBtn">
+                <span class="spinner" aria-hidden="true"></span>
+                <span class="btn-text">Request my free chat</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="f-grid">
+      <div class="f-tile f-state">
+        <p>Plain-English money planning for people at the start of their careers in Singapore.</p>
+        <p class="legal">&copy; <span id="year"></span> Horizon Wealth Planning. For information only; it is not financial advice and does not consider your personal circumstances.</p>
+      </div>
+      <nav class="f-tile f-nav" aria-label="Footer">
+        <ul>
+          <li><a href="#home">Payslip planner</a></li>
+          <li><a href="#waiting">Why start now</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#services">What we do</a></li>
+          <li><a href="#faq">Questions</a></li>
+        </ul>
+      </nav>
+      <div class="f-tile f-time">
+        <span class="c">Singapore</span>
+        <span class="t" id="sgTime">--:--</span>
+      </div>
+      <div class="f-tile f-mail">
+        <span class="c muted">Say hello</span>
+        <a href="mailto:hello@horizonwealth.example">hello@horizonwealth.example</a>
+      </div>
+      <div class="f-tile f-word" aria-hidden="true">Horizon Wealth</div>
+      <a href="#contact" class="f-tile f-join">
+        Book your free chat
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <p class="credits">Pictures and footage: <a href="https://commons.wikimedia.org/w/index.php?curid=3495359">“Kovan HDB flats”</a> by Angcr, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>; <a href="https://commons.wikimedia.org/wiki/File:Seah_Im_Food_Centre.JPG">“Seah Im Food Centre”</a> by Terence Ong, <a href="https://creativecommons.org/licenses/by/2.5">CC BY 2.5</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=31033764">“Singapore CBD skyline from Esplanade at dusk”</a> by Nicolas Lannuzel, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=128198861">“Commuters in a North-South Line MRT Train in Singapore”</a> by YJJcoolcool, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; <a href="https://commons.wikimedia.org/wiki/File:Skylines_of_the_Central_Business_District,_Singapore_at_sunset.jpg">“Skylines of the Central Business District, Singapore at sunset”</a> by Basile Morin, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>; <a href="https://commons.wikimedia.org/wiki/File:Singapore_Marina_Bay_Dusk_2018-02-27.jpg">“Singapore Marina Bay Dusk”</a> by Benh Lieu Song, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=15408565">“Singapore city skyline dusk panorama 2011”</a> by chenisyuan, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.; <a href="https://commons.wikimedia.org/wiki/File:Time-lapse_video_of_the_Merlion_statue,_Merlion_Park,_Singapore_-_20160614.webm">“Time-lapse video of the Merlion statue”</a> by everyhk, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. All via Wikimedia Commons.</p>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+
+  <script>
+    /* =========================================================
+       1. HELPERS
+       ========================================================= */
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+    const sgd = n => (n < 0 ? '-' : '') + 'S$' + Math.round(Math.abs(n)).toLocaleString('en-SG');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* =========================================================
+       2. NAV (hamburger + scroll spy)
+       ========================================================= */
+    (function initNav() {
+      const toggle = $('#navToggle');
+      const links = $('#navLinks');
+      const setOpen = (open) => {
+        links.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+      };
+      toggle.addEventListener('click', () => setOpen(!links.classList.contains('open')));
+      $$('a', links).forEach(a => a.addEventListener('click', () => setOpen(false)));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+
+      const ids = ['home', 'waiting', 'how', 'services', 'faq', 'contact'];
+      const spy = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            $$('a:not(.btn)', links).forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+          }
+        });
+      }, { rootMargin: '-45% 0px -50% 0px' });
+      // Hide the bar while scrolling down so it never sits on top of a heading; bring it back on scroll up
+      const header = $('.site-header'); let lastY = 0;
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        header.classList.toggle('away', y > lastY && y > 240 && !links.classList.contains('open'));
+        lastY = y;
+      }, { passive: true });
+      ids.forEach(id => { const s = document.getElementById(id); if (s) spy.observe(s); });
+    })();
+
+    /* =========================================================
+       3. ENTRANCE ON SCROLL
+       ========================================================= */
+    (function initFadeIn() {
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { en.target.classList.add('visible'); obs.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      $$('.fade-in').forEach(el => io.observe(el));
+      // Stagger the parts of grids of tiles/rules
+      $$('.rules-grid .rule, .how .stage').forEach((el, i) => el.style.setProperty('--d', (i % 4) * 80 + 'ms'));
+    })();
+
+    /* =========================================================
+       4. PAYSLIP PLANNER (hero fragment)
+       ========================================================= */
+    (function initPlanner() {
+      const salary = $('#salary'), range = $('#salaryRange');
+      const OW_CEILING = 8000;                 // CPF Ordinary Wage ceiling from 1 Jan 2026
+      const BRACKETS = [                       // resident income tax bands (YA2024 onwards)
+        [20000, 0], [10000, .02], [10000, .035], [40000, .07], [40000, .115], [40000, .15],
+        [40000, .18], [40000, .19], [40000, .195], [40000, .20], [180000, .22], [500000, .23], [Infinity, .24]
+      ];
+      const tax = (income) => {
+        let left = income, total = 0;
+        for (const [size, rate] of BRACKETS) {
+          const part = Math.min(left, size);
+          if (part <= 0) break;
+          total += part * rate; left -= part;
+        }
+        return total;
+      };
+      const setText = (id, v) => { $('#' + id).textContent = v; };
+
+      function render() {
+        const gross = Math.max(0, Math.min(30000, +salary.value || 0));
+        const wage = Math.min(gross, OW_CEILING);
+        const employee = Math.round(wage * 0.20);
+        const employer = Math.round(wage * 0.17);
+        const cpfTotal = employee + employer;
+        const take = gross - employee;
+        const chargeable = Math.max(0, gross * 12 - employee * 12 - 1000); // CPF relief + Earned Income Relief
+        const monthlyTax = tax(chargeable) / 12;
+        const plan = Math.max(0, take - monthlyTax);
+
+        const [n, w, s] = $('input[name="mode"]:checked').value.split(',').map(Number);
+        const needs = plan * n / 100, wants = plan * w / 100, save = plan * s / 100;
+
+        setText('plGross', sgd(gross));
+        setText('plCpf', sgd(-employee));
+        setText('plTake', sgd(take));
+        setText('plTax', sgd(-monthlyTax));
+        setText('plPlan', sgd(plan));
+        setText('lgNeeds', sgd(needs)); setText('lgWants', sgd(wants)); setText('lgSave', sgd(save));
+        setText('pcNeeds', n + '%'); setText('pcWants', w + '%'); setText('pcSave', s + '%');
+        $('#barNeeds').style.flexBasis = n + '%';
+        $('#barWants').style.flexBasis = w + '%';
+        $('#barSave').style.flexBasis = s + '%';
+
+        const fund = needs * 6;
+        const months = save > 0 ? Math.ceil(fund / save) : 0;
+        $('#factFund').innerHTML = gross
+          ? '<strong>Safety net target: ' + sgd(fund) + '</strong> (six months of needs). ' +
+            (save > 0 ? 'Saving ' + sgd(save) + ' a month gets you there in about ' + months + ' months.' : 'Raise your savings share to reach it.')
+          : 'Enter a salary to see your safety net target.';
+        const oa = cpfTotal * 23 / 37, sa = cpfTotal * 6 / 37, ma = cpfTotal * 8 / 37;
+        $('#factCpf').innerHTML = gross
+          ? '<strong>' + sgd(cpfTotal) + ' goes into your CPF every month</strong> (you and your employer): about ' +
+            sgd(oa) + ' to Ordinary, ' + sgd(sa) + ' to Special and ' + sgd(ma) + ' to MediSave.'
+          : '';
+      }
+
+      salary.addEventListener('input', () => {
+        const v = Math.max(2000, Math.min(15000, +salary.value || 2000));
+        range.value = v; render();
+      });
+      range.addEventListener('input', () => { salary.value = range.value; render(); });
+      $$('input[name="mode"]').forEach(r => r.addEventListener('change', render));
+      render();
+    })();
+
+    /* =========================================================
+       5. THE COST OF WAITING (bars)
+       ========================================================= */
+    (function initWaiting() {
+      const list = $('#bars');
+      const slider = $('#monthly'), out = $('#monthlyOut');
+      const ages = [];
+      for (let a = 22; a <= 35; a++) ages.push(a);
+      const KEY = [22, 25, 35];        // bars that print their value
+      const MOBILE = [22, 25, 28, 31, 35];
+      const fv = (m, age) => {
+        const n = (65 - age) * 12, r = 0.04 / 12;
+        return m * ((Math.pow(1 + r, n) - 1) / r);
+      };
+      const short = v => v >= 1e6 ? 'S$' + (v / 1e6).toFixed(2) + 'm' : 'S$' + Math.round(v / 1000) + 'k';
+      const bars = ages.map(a => {
+        const li = document.createElement('li');
+        li.className = 'bar' + (a === 25 ? ' hot' : '') + (KEY.includes(a) ? ' show' : '');
+        li.tabIndex = 0;
+        if (MOBILE.includes(a)) li.dataset.m = '1';
+        li.innerHTML = '<span class="fill"></span><span class="age">Age ' + a + '</span><span class="val"></span>';
+        list.appendChild(li);
+        return li;
+      });
+      let shown = 0, raf = 0;
+      function paint() {
+        const m = +slider.value;
+        out.textContent = sgd(m);
+        const max = fv(m, 22);
+        bars.forEach((li, i) => {
+          const v = fv(m, ages[i]);
+          li.style.setProperty('--p', (v / max * 100).toFixed(2));
+          $('.val', li).textContent = short(v);
+          li.setAttribute('aria-label', 'Starting at ' + ages[i] + ': about ' + sgd(v) + ' at age 65');
+        });
+        const gap = fv(m, 25) - fv(m, 35);
+        const from = shown, to = gap, t0 = performance.now();
+        cancelAnimationFrame(raf);
+        const tick = now => {
+          const p = reduceMotion ? 1 : Math.min((now - t0) / 700, 1);
+          shown = from + (to - from) * (1 - Math.pow(1 - p, 3));
+          $('#gapNum').textContent = short(shown);
+          if (p < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        $('#gapNote').textContent = 'More by age 65. Illustration only: ' + sgd(m) + ' saved or invested every month at an assumed 4% a year, compounded monthly. Real returns vary and are not guaranteed.';
+      }
+      slider.addEventListener('input', paint);
+      paint();
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { bars.forEach((li, i) => setTimeout(() => li.classList.add('in'), reduceMotion ? 0 : i * 45)); obs.disconnect(); }
+        });
+      }, { threshold: 0.25 });
+      io.observe(list);
+    })();
+
+    /* =========================================================
+       6. SENTENCES WITH SWITCHES
+       ========================================================= */
+    (function initBands() {
+      $$('.band').forEach(band => {
+        const btn = $('.tgl', band);
+        btn.addEventListener('click', () => {
+          const on = btn.getAttribute('aria-checked') !== 'true';
+          btn.setAttribute('aria-checked', String(on));
+          band.classList.toggle('on', on);
+        });
+      });
+    })();
+
+    /* =========================================================
+       7. FAQ (question index, one answer)
+       ========================================================= */
+    (function initFaq() {
+      const qs = $$('.q');
+      const pane = $('#faqPane');
+      const select = (q) => {
+        qs.forEach(x => x.setAttribute('aria-expanded', String(x === q)));
+        pane.classList.add('swap');
+        setTimeout(() => { pane.textContent = q.dataset.a; pane.classList.remove('swap'); }, reduceMotion ? 0 : 150);
+      };
+      qs.forEach(q => {
+        q.addEventListener('click', () => select(q));
+        q.addEventListener('mouseenter', () => { if (window.innerWidth >= 900) select(q); });
+        q.addEventListener('focus', () => { if (window.innerWidth >= 900) select(q); });
+      });
+    })();
+
+    /* =========================================================
+       8. SLOW CROSSFADE (closing tile photograph)
+       ========================================================= */
+    (function initCrossfade() {
+      const vid = $('#loopVid');
+      if (vid && reduceMotion) { vid.removeAttribute('autoplay'); vid.pause(); }
+      const imgs = $$('#xfade img');
+      if (reduceMotion || imgs.length < 2) return;
+      let i = 0;
+      setInterval(() => {
+        if (document.hidden) return;
+        imgs[i].classList.remove('on');
+        i = (i + 1) % imgs.length;
+        imgs[i].classList.add('on');
+      }, 5500);
+    })();
+
+    /* =========================================================
+       9. CLOSING EMAIL TILE -> BOOKING FORM
+       ========================================================= */
+    (function initCta() {
+      const form = $('#ctaForm'), input = $('#ctaEmail'), msg = $('#ctaMsg');
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const v = input.value.trim();
+        if (!emailRe.test(v)) {
+          msg.textContent = v ? 'Please enter a valid email address.' : 'Please enter your email address.';
+          input.focus();
+          return;
+        }
+        msg.textContent = '';
+        $('#email').value = v;
+        document.getElementById('contact').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+        setTimeout(() => $('#fullName').focus({ preventScroll: true }), reduceMotion ? 0 : 600);
+      });
+    })();
+
+    /* =========================================================
+       10. ENQUIRY FORM VALIDATION & SUBMISSION
+       ========================================================= */
+    (function initForm() {
+      const form = $('#enquiryForm');
+      const btn = $('#submitBtn');
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRe = /^\d{8,15}$/;
+
+      const setError = (id, msg) => {
+        const err = $('#' + id + '-err');
+        const input = document.getElementById(id);
+        err.textContent = msg;
+        if (input) {
+          input.classList.toggle('invalid', !!msg);
+          input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+        }
+        return !msg;
+      };
+
+      const validators = {
+        fullName: () => setError('fullName', $('#fullName').value.trim().length < 2 ? 'Please enter your full name.' : ''),
+        email: () => {
+          const v = $('#email').value.trim();
+          return setError('email', !v ? 'Email is required.' : !emailRe.test(v) ? 'Please enter a valid email address.' : '');
+        },
+        phone: () => {
+          const v = $('#phone').value.trim();
+          return setError('phone', !v ? 'Mobile number is required.' : !phoneRe.test(v) ? 'Use digits only, 8 to 15 digits, for example 91234567.' : '');
+        },
+        stage: () => setError('stage', !$('#stage').value ? 'Please tell us where you are now.' : ''),
+        interest: () => setError('interest', !$('#interest').value ? 'Please choose what you want help with.' : ''),
+        contactMethod: () => {
+          const ok = !!$('input[name="contactMethod"]:checked');
+          $('#contactMethod-err').textContent = ok ? '' : 'Please choose a contact method.';
+          return ok;
+        },
+        consent: () => {
+          const ok = $('#consent').checked;
+          $('#consent-err').textContent = ok ? '' : 'You must agree to be contacted.';
+          return ok;
+        }
+      };
+
+      Object.keys(validators).forEach(key => {
+        const els = key === 'contactMethod' ? $$('input[name="contactMethod"]') : [document.getElementById(key)];
+        els.forEach(el => {
+          el.addEventListener('blur', validators[key]);
+          el.addEventListener(el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT' ? 'change' : 'input', () => {
+            if (el.classList.contains('invalid') || $('#' + key + '-err').textContent) validators[key]();
+          });
+        });
+      });
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const results = Object.values(validators).map(fn => fn());
+        if (results.includes(false)) {
+          const firstBad = $('.invalid', form) || form.querySelector('.error-msg:not(:empty)');
+          if (firstBad && firstBad.focus) firstBad.focus();
+          return;
+        }
+
+        const data = {
+          fullName: $('#fullName').value.trim(),
+          email: $('#email').value.trim(),
+          phone: $('#phone').value.trim(),
+          stage: $('#stage').value,
+          helpWith: $('#interest').value,
+          preferredContactMethod: $('input[name="contactMethod"]:checked').value,
+          message: $('#message').value.trim(),
+          consent: $('#consent').checked
+        };
+
+        btn.disabled = true;
+        btn.classList.add('loading');
+        $('.btn-text', btn).textContent = 'Sending…';
+
+        setTimeout(() => {
+          console.log(JSON.stringify(data, null, 2));   // no backend: wire this to a real endpoint before launch
+          const card = $('#formCard');
+          card.innerHTML = '';
+          const box = document.createElement('div');
+          box.className = 'success';
+          box.setAttribute('role', 'status');
+          box.innerHTML = '<div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></div>' +
+            '<h3></h3><p>We have your details. A planner will reach out on <strong></strong> within one business day.</p>';
+          $('h3', box).textContent = 'Thank you, ' + data.fullName.split(' ')[0] + '.';
+          $('strong', box).textContent = data.preferredContactMethod;
+          card.appendChild(box);
+          box.setAttribute('tabindex', '-1');
+          box.focus();
+        }, 1500);
+      });
+    })();
+
+    /* =========================================================
+       11. FOOTER (year, Singapore time) & BACK-TO-TOP
+       ========================================================= */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    (function initClock() {
+      const el = $('#sgTime');
+      const fmt = new Intl.DateTimeFormat('en-SG', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Singapore' });
+      const tick = () => { el.textContent = fmt.format(new Date()); };
+      tick(); setInterval(tick, 30000);
+    })();
+
+    (function initToTop() {
+      const btn = $('#toTop');
+      window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 400), { passive: true });
+      btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+    })();
+  </script>
+</body>
+</html>

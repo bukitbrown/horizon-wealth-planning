@@ -1,0 +1,14 @@
+.env*
+*.key
+*.pem
+.claude/
+.mcp.json
+.playwright-mcp/
+.taste-skill/
+skills-lock.json
+*.docx
+task1-screenshot.png
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
